@@ -41,6 +41,18 @@ let usuarioSchema = new Schema({
     }
 });
 
+//Metodos para modificar el prototipo Usuario
+usuarioSchema.methods.toJSON = function() {
+
+    let user = this;
+    //Pasamos el usuario JSON a Object
+    let userObject = user.toObject();
+    //Eliminamos el parametro password 
+    delete userObject.password;
+
+    return userObject;
+}
+
 usuarioSchema.plugin(uniqueValidator, { message: '{PATH} debe de ser unico' });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

@@ -19,9 +19,13 @@ app.use(require('./routes/usuario'));
 
 
 
-
-
-mongoose.connect('mongodb://localhost:27017/cafe', (err, res) => {
+const connOptions = {
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+}
+mongoose.set('useCreateIndex', true);
+mongoose.connect(process.env.URL_DB, connOptions, (err, res) => {
     if (err) throw err;
     console.log('Online');
 });
