@@ -3,16 +3,16 @@ const Usuario = require('../models/usuario');
 const app = express();
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
-
+const { verificaToken, verificaAdmin_Role } = require('../middlewares/autenticacion');
 
 //Para crear registro
-app.get('/usuario', (req, res) => {
+app.get('/usuario', verificaToken, (req, res) => {
 
     let desde = Number(req.query.desde) || 0;
     let hasta = Number(req.query.hasta) || 5;
 
-    let condicionUsuario={
-      estado: true
+    let condicionUsuario = {
+        estado: true
     }
 
     Usuario.find(condicionUsuario, 'nombre email') //Para filtrar por campos
@@ -38,10 +38,12 @@ app.get('/usuario', (req, res) => {
 });
 
 //Para crear registro
-app.post('/usuario', (req, res) => {
+app.post('/usuario', [verificaToken, verificaAdmin_Role], (req, res) => {
 
     //Tratamos el payload de la url gracias al bodyParser
     let body = req.body;
+
+    console.log('Creado: ', body);
 
     let usuario = new Usuario({
         nombre: body.nombre,
@@ -77,7 +79,7 @@ app.post('/usuario', (req, res) => {
 });
 
 //Para actaulizar datos
-app.put('/usuario/:id', (req, res) => {
+app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
 
     let id = req.params.id;
     //Array con los campos permitidos a actualizar
@@ -99,34 +101,34 @@ app.put('/usuario/:id', (req, res) => {
 });
 
 //Para borrar datos
-app.delete('/usuario/:id', (req, res) => {
+app.delete('/usuario/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
     let id = req.params.id;
     console.log(id);
     //Usuario.findByIdAndRemove(id, (err, usuarioBorrado)=>{
     //Para invalidar al usuario pero no borrarlo:
     let cambiaEstado = {
-      estado: false
+        estado: false
     };
-    Usuario.findByIdAndUpdate(id, cambiaEstado, { new: true}, (err, usuarioBorrado) => {
-      if (err) {
-          return res.status(400).json({
-              ok: false,
-              err
-          });
-      }
-      //En caso de no encontrar el usuario pero no saltar error
-      if (!usuarioBorrado) {
-          return res.status(400).json({
-              ok: false,
-              err: {
-                mensaje: 'Usuario no encontrado'
-              }
-          });
-      }
-      res.json({
-        ok: true,
-        usuario: usuarioBorrado
-      });
+    Usuario.findByIdAndUpdate(id, cambiaEstado, { new: true }, (err, usuarioBorrado) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+        //En caso de no encontrar el usuario pero no saltar error
+        if (!usuarioBorrado) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    mensaje: 'Usuario no encontrado'
+                }
+            });
+        }
+        res.json({
+            ok: true,
+            usuario: usuarioBorrado
+        });
     });
 });
 

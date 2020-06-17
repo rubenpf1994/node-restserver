@@ -6,15 +6,14 @@ const app = express();
 const bodyParser = require('body-parser');
 
 //Procesará cualquier payload que reciba la url
+//parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
+
 //parse application/json
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-    res.json('Hello world');
-});
-
-app.use(require('./routes/usuario'));
+//COndiguracion global de rutas
+app.use(require('./routes/index'));
 
 
 
