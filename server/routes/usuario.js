@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 const { verificaToken, verificaAdmin_Role } = require('../middlewares/autenticacion');
 
-//Para crear registro
 app.get('/usuario', verificaToken, (req, res) => {
 
     let desde = Number(req.query.desde) || 0;
